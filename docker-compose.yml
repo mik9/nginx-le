@@ -3,7 +3,7 @@ services:
 
     nginx:
         build: .
-        image: umputun/nginx-le:latest
+        image: mik9/nginx-le:latest
         hostname: nginx
         restart: always
         container_name: nginx

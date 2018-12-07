@@ -27,13 +27,10 @@ sed -i "s|SSL_KEY|${SSL_KEY}|g" /etc/nginx/conf.d/*.conf
 sed -i "s|SSL_CERT|${SSL_CERT}|g" /etc/nginx/conf.d/*.conf
 sed -i "s|SSL_CHAIN_CERT|${SSL_CHAIN_CERT}|g" /etc/nginx/conf.d/*.conf
 
-#generate dhparams.pem
-if [ ! -f /etc/nginx/ssl/dhparams.pem ]; then
-    echo "make dhparams"
-    cd /etc/nginx/ssl
-    openssl dhparam -out dhparams.pem 2048
-    chmod 600 dhparams.pem
-fi
+LOCKFILE=/etc/nginx/ssl/LOCK
+touch $LOCKFILE
+
+setlock $LOCKFILE /dhparams.sh
 
 #disable ssl configuration and let it run without SSL
 mv -v /etc/nginx/conf.d /etc/nginx/conf.d.disabled
@@ -44,7 +41,7 @@ mv -v /etc/nginx/conf.d /etc/nginx/conf.d.disabled
  while :
  do
 	echo "trying to update letsencrypt ..."
-    /le.sh
+    setlock $LOCKFILE /le.sh
     rm -f /etc/nginx/conf.d/default.conf 2>/dev/null #remove default config, conflicting on 80
     mv -v /etc/nginx/conf.d.disabled /etc/nginx/conf.d #enable
     echo "reload nginx with ssl"
