@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#replace LE_FQDN
+sed -i "s|LE_FQDN|${LE_FQDN}|g" /etc/nginx/conf.d/*.conf
+
 #generate dhparams.pem
 if [ ! -f /etc/nginx/ssl/dhparams.pem ]; then
     echo "make dhparams"
